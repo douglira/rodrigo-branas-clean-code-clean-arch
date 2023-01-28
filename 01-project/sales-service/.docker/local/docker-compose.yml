@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  pg-sales-service:
+    build:
+      context: ../sql
+      dockerfile: Dockerfile
+    container_name: sales-service
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=default
+      - POSTGRES_DB=sales_service
