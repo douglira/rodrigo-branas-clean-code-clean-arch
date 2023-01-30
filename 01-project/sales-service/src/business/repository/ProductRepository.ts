@@ -7,12 +7,16 @@ import Product from '../model/Product';
 export class ProductRepository implements ProductRepositoryInterface {
   constructor(@Inject(PRODUCT_DATABASE) private readonly productDatabase: ProductDatabaseInterface) {}
 
-  async getAll(): Promise<Product[]> {
-    const result = await this.productDatabase.getAll();
+  private factoryProductByProductsData(productsData: any): Product[] {
     const products = new Array<Product>();
-    result.forEach((p: any) => {
-      products.push(new Product(p.id, p.title, p.base_price));
+    productsData.forEach((productData) => {
+      products.push(new Product(productData.id, productData.title, productData.base_price));
     });
     return products;
+  }
+
+  async findByIds(ids: string[]): Promise<Product[]> {
+    const result = await this.productDatabase.findByIds(ids);
+    return this.factoryProductByProductsData(result);
   }
 }

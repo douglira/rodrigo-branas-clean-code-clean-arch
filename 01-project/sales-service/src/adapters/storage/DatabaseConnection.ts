@@ -21,7 +21,7 @@ export class DatabaseConnection {
       const client = await conn.connect();
       return client;
     } catch (err) {
-      console.log('ERRROOOOOOOOO', err);
+      console.log('Database connection error', err);
       throw err;
     }
   }

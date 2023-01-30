@@ -7,9 +7,17 @@ import { ProductDatabaseInterface } from './ProductDatabaseInterface';
 export class ProductDatabase implements ProductDatabaseInterface {
   constructor(@Inject(CONNECTION_PROVIDER) private readonly connection: PoolClient) {}
 
-  async getAll(): Promise<any> {
-    const result = await this.connection.query('SELECT * FROM sales_service.products');
-    this.connection.release();
-    return result.rows;
+  async findByIds(ids: string[]): Promise<any> {
+    try {
+      const queryString = `SELECT * FROM sales_service.products p WHERE p.id IN (${ids
+        .map((_, index) => `$${index + 1}`)
+        .join(',')})`;
+      const result = await this.connection.query(queryString, ids);
+      return result.rows;
+    } catch (err) {
+      throw err;
+    } finally {
+      this.connection.release();
+    }
   }
 }

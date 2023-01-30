@@ -8,4 +8,8 @@ export default class OrderItem {
     this.product = product;
     this.quantity = quantity;
   }
+
+  setProduct(product: Product): void {
+    this.product = product;
+  }
 }

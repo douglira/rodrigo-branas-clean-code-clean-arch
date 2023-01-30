@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Scope } from '@nestjs/common';
 import { ProductDatabase } from './data/ProductDatabase';
 import { PRODUCT_DATABASE } from './data/ProductDatabaseInterface';
 import { CONNECTION_PROVIDER, DatabaseConnection } from './DatabaseConnection';
@@ -8,6 +8,7 @@ import { CONNECTION_PROVIDER, DatabaseConnection } from './DatabaseConnection';
     {
       provide: CONNECTION_PROVIDER,
       useFactory: () => DatabaseConnection.getConnection(),
+      scope: Scope.REQUEST,
     },
     { provide: PRODUCT_DATABASE, useClass: ProductDatabase },
   ],
