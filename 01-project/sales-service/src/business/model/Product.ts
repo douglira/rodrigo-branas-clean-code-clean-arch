@@ -8,4 +8,8 @@ export default class Product {
     this.title = title;
     this.basePrice = basePrice;
   }
+
+  isEqualById(product: Product): boolean {
+    return product.id === this.id;
+  }
 }

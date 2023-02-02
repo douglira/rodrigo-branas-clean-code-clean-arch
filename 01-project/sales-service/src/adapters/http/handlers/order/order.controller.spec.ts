@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { COUPON_REPOSITORY } from '../../../../business/repository/CouponRepositoryInterface';
 import { PRODUCT_REPOSITORY } from '../../../../business/repository/ProductRepositoryInterface';
 import { OrderSolicitationService } from './../../../../business/service/OrderSolicitationService';
 import {
@@ -18,6 +19,7 @@ describe('OrderControllerV1', () => {
       providers: [
         { provide: ORDER_SOLICITATION_SERVICE, useClass: OrderSolicitationService },
         { provide: PRODUCT_REPOSITORY, useValue: () => Promise.resolve() },
+        { provide: COUPON_REPOSITORY, useValue: () => Promise.resolve() },
       ],
     }).compile();
 

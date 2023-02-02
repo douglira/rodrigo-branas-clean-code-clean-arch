@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Inject, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   OrderSolicitationServiceInterface,
   ORDER_SOLICITATION_SERVICE,
@@ -19,11 +19,12 @@ export class OrderControllerV1 {
   ) {}
 
   @Post('solicitation-preview')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async solicitationPreview(
     @Body() body: OrderSolicitationPreviewPayloadRequest,
   ): Promise<OrderSolicitationPreviewPayloadResponse> {
     const orderSolicitationCalculated = await this.orderSolicitation.calculatePreview(
-      OrderSolicitationPreviewPayloadRequest.build(body.orderItems),
+      OrderSolicitationPreviewPayloadRequest.build(body),
     );
     return new OrderSolicitationPreviewPayloadResponse(orderSolicitationCalculated.getFinalTotalAmount());
   }

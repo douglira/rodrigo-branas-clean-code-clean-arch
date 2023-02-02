@@ -1,3 +1,1 @@
 CREATE SCHEMA IF NOT EXISTS sales_service;
-
-COMMIT;
