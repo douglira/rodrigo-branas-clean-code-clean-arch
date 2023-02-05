@@ -46,10 +46,7 @@ export default class OrderSolicitation {
   }
 
   private calculateDiscountOverFinalAmount(): void {
-    if (this.hasCoupon()) {
-      this.discountValue = this.finalTotalAmount * (this.coupon.discount / 100);
-      this.finalTotalAmount -= this.discountValue;
-    }
+    this.finalTotalAmount -= this.coupon.getDiscountAmount(this.finalTotalAmount);
   }
 
   hasCouponCode(): boolean {

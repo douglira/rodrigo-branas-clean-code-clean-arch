@@ -1,4 +1,15 @@
-import { Controller, Post, Body, Inject, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Inject,
+  UsePipes,
+  ValidationPipe,
+  UseFilters,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import { BusinessExceptionFilter } from '../../exceptions/BusinessExceptionFilter';
 import {
   OrderSolicitationServiceInterface,
   ORDER_SOLICITATION_SERVICE,
@@ -12,6 +23,7 @@ import {
   path: 'orders',
   version: '1',
 })
+@UseFilters(BusinessExceptionFilter)
 export class OrderControllerV1 {
   constructor(
     @Inject(ORDER_SOLICITATION_SERVICE)
@@ -19,6 +31,7 @@ export class OrderControllerV1 {
   ) {}
 
   @Post('solicitation-preview')
+  @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true }))
   async solicitationPreview(
     @Body() body: OrderSolicitationPreviewPayloadRequest,

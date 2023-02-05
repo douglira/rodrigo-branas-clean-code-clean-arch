@@ -10,7 +10,7 @@ export class CouponRepository implements CouponRepositoryInterface {
   private factoryCouponByCouponsData(couponsData: any): Coupon[] {
     const coupons = new Array<Coupon>();
     couponsData.forEach((couponData) => {
-      coupons.push(new Coupon(couponData.id, couponData.name, couponData.discount));
+      coupons.push(new Coupon(couponData.id, couponData.name, couponData.discount, couponData.expires_in));
     });
     return coupons;
   }
