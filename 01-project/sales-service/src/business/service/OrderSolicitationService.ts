@@ -26,8 +26,9 @@ export class OrderSolicitationService implements OrderSolicitationServiceInterfa
     let coupon = new Coupon();
     if (orderSolicitation.hasCouponCode()) {
       coupon = await this.couponRepository.findByName(orderSolicitation.getCoupon().name);
+      orderSolicitation.setCoupon(coupon);
     }
-    orderSolicitation.calculateFinalTotalAmountByProducts(products, coupon);
+    orderSolicitation.calculateFinalTotalAmountByProducts(products);
     return new OrderSolicitationPreviewPayloadResponse(
       orderSolicitation.getFinalTotalAmount(),
       orderSolicitation.getFreightCost(),

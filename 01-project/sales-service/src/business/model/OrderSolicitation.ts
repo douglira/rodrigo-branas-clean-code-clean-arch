@@ -37,7 +37,11 @@ export default class OrderSolicitation {
     this.items.push(item);
   }
 
-  calculateFinalTotalAmountByProducts(products: Product[], coupon?: Coupon): void {
+  setCoupon(coupon: Coupon): void {
+    this.coupon = coupon;
+  }
+
+  calculateFinalTotalAmountByProducts(products: Product[]): void {
     if (products.length !== this.items.length)
       throw new OrderSolicitationException({
         type: OrderSolicitationExceptionType.PRODUCTS_LIST_DIFFER_ITEMS_LIST_FROM_AMOUNT_CALCULATION,
@@ -53,15 +57,14 @@ export default class OrderSolicitation {
       this.finalTotalAmount += item.quantity * product.basePrice;
     });
     this.items = itemsAndProductsPopulated;
-    if (coupon) {
-      this.coupon = coupon;
-    }
     this.applyDiscountOverFinalAmount();
     this.applyFreightOverFinalAmount();
   }
 
   private applyDiscountOverFinalAmount(): void {
-    this.finalTotalAmount -= this.coupon.getDiscountAmount(this.finalTotalAmount);
+    if (this.coupon) {
+      this.finalTotalAmount -= this.coupon.getDiscountAmount(this.finalTotalAmount);
+    }
   }
 
   private applyFreightOverFinalAmount(): void {
