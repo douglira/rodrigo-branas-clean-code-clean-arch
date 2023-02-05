@@ -1,6 +1,6 @@
 import { CpfValidator } from './CpfValidator';
 
-describe('CpfValidator', () => {
+describe('Validator:Cpf', () => {
   it.each(['407.302.170-27', '684.053.160-00', '746.971.314-01'])('should test a valid cpf', (cpf) => {
     const cpfValidator = new CpfValidator();
     const isValid = cpfValidator.validate(cpf);

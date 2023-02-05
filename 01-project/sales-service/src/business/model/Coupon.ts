@@ -1,5 +1,4 @@
-import { HttpStatus } from '@nestjs/common';
-import { CouponException, CouponExceptionType } from '../exceptions/coupon/CouponException';
+import { CouponException, CouponExceptionType } from '../exceptions/CouponException';
 
 export default class Coupon {
   id: string;
@@ -35,7 +34,6 @@ export default class Coupon {
     if (this.isExpired()) {
       throw new CouponException({
         type: CouponExceptionType.COUPON_EXPIRED,
-        httpStatus: HttpStatus.CONFLICT,
       });
     }
   }

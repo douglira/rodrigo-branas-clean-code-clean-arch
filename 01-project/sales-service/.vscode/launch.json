@@ -21,11 +21,26 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Test:Nest Framework",
+      "name": "Debug Unit Test:Nest Framework",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
         "test:debug",
+      ],
+      "autoAttachChildProcesses": true,
+      "restart": true,
+      "sourceMaps": true,
+      "stopOnEntry": false,
+      "console": "integratedTerminal",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug E2E Test:Nest Framework",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "test:e2e",
         "--",
         "--inspect-brk"
       ],

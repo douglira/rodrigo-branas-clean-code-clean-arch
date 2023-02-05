@@ -36,9 +36,6 @@ export class OrderControllerV1 {
   async solicitationPreview(
     @Body() body: OrderSolicitationPreviewPayloadRequest,
   ): Promise<OrderSolicitationPreviewPayloadResponse> {
-    const orderSolicitationCalculated = await this.orderSolicitation.calculatePreview(
-      OrderSolicitationPreviewPayloadRequest.build(body),
-    );
-    return new OrderSolicitationPreviewPayloadResponse(orderSolicitationCalculated.getFinalTotalAmount());
+    return this.orderSolicitation.calculatePreview(body);
   }
 }

@@ -6,10 +6,13 @@ import {
   OrderSolicitationServiceInterface,
   ORDER_SOLICITATION_SERVICE,
 } from './../../../../business/service/OrderSolicitationServiceInterface';
-import { OrderSolicitationPreviewPayloadRequest } from './dto/OrderSolicitationPreviewPayload';
+import {
+  OrderSolicitationPreviewPayloadRequest,
+  OrderSolicitationPreviewPayloadResponse,
+} from './dto/OrderSolicitationPreviewPayload';
 import { OrderControllerV1 } from './order.controller';
 
-describe('OrderControllerV1', () => {
+describe('Controller:OrderV1', () => {
   let orderController: OrderControllerV1;
   let orderSolicitationService: OrderSolicitationServiceInterface;
 
@@ -35,7 +38,7 @@ describe('OrderControllerV1', () => {
     it('should calculate total order amount', async () => {
       const calculatePreviewMock = jest
         .spyOn(orderSolicitationService, 'calculatePreview')
-        .mockImplementation((orderSolicitation) => Promise.resolve(orderSolicitation));
+        .mockImplementation(() => Promise.resolve(new OrderSolicitationPreviewPayloadResponse(100, 10)));
       await orderController.solicitationPreview(new OrderSolicitationPreviewPayloadRequest([]));
       expect(calculatePreviewMock).toBeCalledTimes(1);
     });

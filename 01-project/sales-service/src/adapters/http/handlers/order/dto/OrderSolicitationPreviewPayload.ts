@@ -26,18 +26,21 @@ export class OrderSolicitationPreviewPayloadRequest {
   }
 
   public static build(body: OrderSolicitationPreviewPayloadRequest): OrderSolicitation {
-    const solicitation = new OrderSolicitation(new Array<OrderItem>(), new Coupon('', body.coupon));
+    const orderItems = new Array<OrderItem>();
     body.orderItems.forEach((item) => {
       const product = new Product(item.productId);
       const orderItem = new OrderItem(product, item.quantity);
-      solicitation.addItem(orderItem);
+      orderItems.push(orderItem);
     });
-    return solicitation;
+    return new OrderSolicitation(orderItems, new Coupon('', body.coupon));
   }
 }
 
 export class OrderSolicitationPreviewPayloadResponse {
-  constructor(private readonly totalAmount: number) {
-    this.totalAmount = totalAmount;
+  readonly totalAmount: number;
+  readonly freightCost: number;
+  constructor(totalAmount: number, freightCost: number) {
+    this.totalAmount = parseFloat(totalAmount.toFixed(2));
+    this.freightCost = parseFloat(freightCost.toFixed(2));
   }
 }

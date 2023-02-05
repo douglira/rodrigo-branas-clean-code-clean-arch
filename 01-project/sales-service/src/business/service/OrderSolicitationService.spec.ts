@@ -1,7 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import OrderItem from '../model/OrderItem';
 import Product from '../model/Product';
-import OrderSolicitation from '../model/OrderSolicitation';
 import { ProductRepositoryInterface, PRODUCT_REPOSITORY } from '../repository/ProductRepositoryInterface';
 import { OrderSolicitationService } from './OrderSolicitationService';
 import { OrderSolicitationServiceInterface, ORDER_SOLICITATION_SERVICE } from './OrderSolicitationServiceInterface';
@@ -11,9 +9,15 @@ import Coupon from '../model/Coupon';
 import { CouponRepositoryInterface, COUPON_REPOSITORY } from '../repository/CouponRepositoryInterface';
 import { CouponRepository } from '../repository/CouponRepository';
 import { COUPON_DATABASE } from '../../adapters/storage/data/CouponDatabaseInterface';
-import { CouponException } from '../exceptions/coupon/CouponException';
+import { CouponException, CouponExceptionType } from '../exceptions/CouponException';
+import {
+  OrderItemDTO,
+  OrderSolicitationPreviewPayloadRequest,
+} from '../../adapters/http/handlers/order/dto/OrderSolicitationPreviewPayload';
+import { OrderSolicitationException, OrderSolicitationExceptionType } from '../exceptions/OrderSolicitationException';
+import { Measurements } from '../model/Measurements';
 
-describe('OrderSolicitationService', () => {
+describe('Service:OrderSolicitation', () => {
   let orderSolicitationService: OrderSolicitationServiceInterface;
   let productRepository: ProductRepositoryInterface;
   let couponRepository: CouponRepositoryInterface;
@@ -39,46 +43,47 @@ describe('OrderSolicitationService', () => {
   });
 
   describe('calculatePreview', () => {
-    it('should calculate final total order amount with 3 order items and no coupon', async () => {
-      const items = new Array<OrderItem>(
-        new OrderItem(new Product('ID1'), 3),
-        new OrderItem(new Product('ID2'), 1),
-        new OrderItem(new Product('ID3'), 1),
+    it('should calculate final total order amount with 3 order items, no coupon and freight', async () => {
+      const items = new Array<OrderItemDTO>(
+        new OrderItemDTO('ID1', 3),
+        new OrderItemDTO('ID2', 1),
+        new OrderItemDTO('ID3', 1),
       );
-      const orderSolicitationInput = new OrderSolicitation(items);
+      const orderSolicitationInput = new OrderSolicitationPreviewPayloadRequest(items);
       const productRepositoryMock = jest
         .spyOn(productRepository, 'findByIds')
         .mockImplementation(() =>
           Promise.resolve(
             new Array<Product>(
-              new Product('ID1', 'P1', 15),
-              new Product('ID2', 'P1', 40),
-              new Product('ID3', 'P1', 90),
+              new Product('ID1', 'P1', 15, new Measurements(10, 15, 20, 2)),
+              new Product('ID2', 'P1', 40, new Measurements(30, 40, 60, 2.5)),
+              new Product('ID3', 'P1', 90, new Measurements(80, 120, 220, 10)),
             ),
           ),
         );
       const result = await orderSolicitationService.calculatePreview(orderSolicitationInput);
       expect(productRepositoryMock).toBeCalledTimes(1);
-      expect(result.getFinalTotalAmount()).toBe(175);
+      expect(result.totalAmount).toBe(303.94);
+      expect(result.freightCost).toBe(128.94);
     });
-    it('should calculate final total order amount with 4 order items and 1 discount coupon', async () => {
-      const items = new Array<OrderItem>(
-        new OrderItem(new Product('ID1'), 3),
-        new OrderItem(new Product('ID2'), 1),
-        new OrderItem(new Product('ID3'), 1),
-        new OrderItem(new Product('ID4'), 1),
+    it('should calculate final total order amount with 4 order items, 1 discount coupon and freight', async () => {
+      const items = new Array<OrderItemDTO>(
+        new OrderItemDTO('ID1', 3),
+        new OrderItemDTO('ID2', 1),
+        new OrderItemDTO('ID3', 1),
+        new OrderItemDTO('ID4', 1),
       );
-      const coupon = new Coupon('', 'VALE30');
-      const orderSolicitationInput = new OrderSolicitation(items, coupon);
+      const couponCode = 'VALE30';
+      const orderSolicitationInput = new OrderSolicitationPreviewPayloadRequest(items, couponCode);
       const productRepositoryMock = jest
         .spyOn(productRepository, 'findByIds')
         .mockImplementation(() =>
           Promise.resolve(
             new Array<Product>(
-              new Product('ID1', 'P1', 15),
-              new Product('ID2', 'P2', 40),
-              new Product('ID3', 'P3', 20),
-              new Product('ID4', 'P4', 70),
+              new Product('ID1', 'P1', 15, new Measurements(10, 15, 20, 2)),
+              new Product('ID2', 'P2', 40, new Measurements(30, 40, 60, 2.5)),
+              new Product('ID3', 'P3', 20, new Measurements(80, 120, 220, 10)),
+              new Product('ID4', 'P4', 70, new Measurements(220, 300, 430, 16)),
             ),
           ),
         );
@@ -88,23 +93,24 @@ describe('OrderSolicitationService', () => {
       const result = await orderSolicitationService.calculatePreview(orderSolicitationInput);
       expect(productRepositoryMock).toBeCalledTimes(1);
       expect(couponRepositotyMock).toBeCalledTimes(1);
-      expect(result.getFinalTotalAmount()).toBe(122.5);
+      expect(result.totalAmount).toBe(261.44);
+      expect(result.freightCost).toBe(138.94);
     });
-    it('should not calculate final total order amount for expired discount', async () => {
-      const items = new Array<OrderItem>(
-        new OrderItem(new Product('ID2'), 1),
-        new OrderItem(new Product('ID3'), 1),
-        new OrderItem(new Product('ID4'), 1),
+    it('should error when calculate final total order amount for expired discount', async () => {
+      const items = new Array<OrderItemDTO>(
+        new OrderItemDTO('ID2', 1),
+        new OrderItemDTO('ID3', 1),
+        new OrderItemDTO('ID4', 1),
       );
-      const coupon = new Coupon('', 'VALE30');
-      const orderSolicitationInput = new OrderSolicitation(items, coupon);
+      const couponCode = 'VALE30';
+      const orderSolicitationInput = new OrderSolicitationPreviewPayloadRequest(items, couponCode);
       const productRepositoryMock = jest
         .spyOn(productRepository, 'findByIds')
         .mockImplementation(() =>
           Promise.resolve(
             new Array<Product>(
-              new Product('ID2', 'P2', 40),
-              new Product('ID3', 'P3', 20),
+              new Product('ID2', 'P2', 40, new Measurements(30, 40, 60, 2.5)),
+              new Product('ID3', 'P3', 20, new Measurements(80, 120, 220, 10)),
               new Product('ID4', 'P4', 70),
             ),
           ),
@@ -116,8 +122,39 @@ describe('OrderSolicitationService', () => {
         .mockImplementation(() => Promise.resolve(new Coupon('ID1', 'VALE30', 30, new Date(expiredData))));
       const rejectionPromise = orderSolicitationService.calculatePreview(orderSolicitationInput);
       await expect(rejectionPromise).rejects.toThrow(CouponException);
+      await expect(rejectionPromise).rejects.toThrow(CouponExceptionType.COUPON_EXPIRED.toString());
       expect(productRepositoryMock).toBeCalledTimes(1);
       expect(couponRepositotyMock).toBeCalledTimes(1);
+    });
+    it('should error when calculate final total order amount for repeated order item products', async () => {
+      const items = new Array<OrderItemDTO>(
+        new OrderItemDTO('ID2', 1),
+        new OrderItemDTO('ID3', 1),
+        new OrderItemDTO('ID3', 1),
+      );
+      const couponCode = 'VALE30';
+      const orderSolicitationInput = new OrderSolicitationPreviewPayloadRequest(items, couponCode);
+      const productRepositoryMock = jest
+        .spyOn(productRepository, 'findByIds')
+        .mockImplementation(() =>
+          Promise.resolve(
+            new Array<Product>(
+              new Product('ID2', 'P2', 40, new Measurements(30, 40, 60, 2.5)),
+              new Product('ID3', 'P3', 20, new Measurements(80, 120, 220, 10)),
+              new Product('ID4', 'P4', 70),
+            ),
+          ),
+        );
+      const FIVE_HOURS_MILLISECONDS = 1000 * 60 * 60 * 5;
+      const expiredData = Date.now() - FIVE_HOURS_MILLISECONDS;
+      const couponRepositotyMock = jest
+        .spyOn(couponRepository, 'findByName')
+        .mockImplementation(() => Promise.resolve(new Coupon('ID1', 'VALE30', 30, new Date(expiredData))));
+      const rejectionPromise = orderSolicitationService.calculatePreview(orderSolicitationInput);
+      await expect(rejectionPromise).rejects.toThrow(OrderSolicitationException);
+      await expect(rejectionPromise).rejects.toThrow(OrderSolicitationExceptionType.INVALID_QUANTITY.toString());
+      expect(productRepositoryMock).toBeCalledTimes(0);
+      expect(couponRepositotyMock).toBeCalledTimes(0);
     });
   });
 });

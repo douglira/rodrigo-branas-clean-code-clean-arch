@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ProductDatabaseInterface, PRODUCT_DATABASE } from '../../adapters/storage/data/ProductDatabaseInterface';
 import { ProductRepositoryInterface } from './ProductRepositoryInterface';
 import Product from '../model/Product';
+import { Measurements } from '../model/Measurements';
 
 @Injectable()
 export class ProductRepository implements ProductRepositoryInterface {
@@ -10,7 +11,13 @@ export class ProductRepository implements ProductRepositoryInterface {
   private factoryProductByProductsData(productsData: any): Product[] {
     const products = new Array<Product>();
     productsData.forEach((productData) => {
-      products.push(new Product(productData.id, productData.title, productData.base_price));
+      const measurements = new Measurements(
+        productData.width,
+        productData.height,
+        productData.depth,
+        productData.weight,
+      );
+      products.push(new Product(productData.id, productData.title, productData.base_price, measurements));
     });
     return products;
   }

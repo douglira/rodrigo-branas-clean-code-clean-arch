@@ -38,7 +38,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
         .set('Accept', 'application/json')
         .send(input)
         .expect(HttpStatus.OK)
-        .expect({ totalAmount: 131.84 });
+        .expect({ totalAmount: 174.89, freightCost: 43.05 });
     });
     it('should error with expired coupon', async () => {
       const input = {
@@ -65,6 +65,36 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
         code: 'CET1000',
         timestamp: expect.stringMatching(timestampRegexMatching),
       });
+    });
+  });
+  it('should error with repeated order item product', async () => {
+    const input = {
+      cpf: '423.655.858-09',
+      coupon: 'VALE20',
+      orderItems: [
+        {
+          productId: '2558a6df-c01f-41db-b378-75c7402508d5',
+          quantity: 1,
+        },
+        {
+          productId: 'a40b5de2-1038-4c7a-ac26-70d51f0e9e57',
+          quantity: 1,
+        },
+        {
+          productId: 'a40b5de2-1038-4c7a-ac26-70d51f0e9e57',
+          quantity: 1,
+        },
+      ],
+    };
+    const result = await request(app.getHttpServer())
+      .post('/orders/solicitation-preview')
+      .set('Accept', 'application/json')
+      .send(input);
+    expect(result.statusCode).toEqual(HttpStatus.CONFLICT);
+    expect(result.body).toMatchObject({
+      type: 'INVALID_QUANTITY',
+      code: 'OSET1000',
+      timestamp: expect.stringMatching(timestampRegexMatching),
     });
   });
 
