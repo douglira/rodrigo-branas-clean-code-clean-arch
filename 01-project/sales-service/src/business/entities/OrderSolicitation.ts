@@ -10,11 +10,23 @@ export default class OrderSolicitation {
   private coupon: Coupon;
   private freight: Freight;
 
-  constructor(items: Array<OrderItem> = new Array<OrderItem>(), coupon?: Coupon) {
+  constructor(items: Array<OrderItem> = new Array<OrderItem>(), coupon?: Coupon, freight?: Freight) {
     this.items = items;
     this.finalTotalAmount = 0;
     this.coupon = coupon;
+    this.freight = freight;
     this.validateCreation();
+    this.addFreightCost();
+  }
+
+  private validateCreation(): void {
+    if (this.hasRepeatedOrderItem()) {
+      throw new OrderSolicitationException({ type: OrderSolicitationExceptionType.INVALID_QUANTITY });
+    }
+  }
+
+  private addFreightCost(): void {
+    this.finalTotalAmount += this.freight.getCost();
   }
 
   getItems(): OrderItem[] {
@@ -37,26 +49,18 @@ export default class OrderSolicitation {
     this.items.push(item);
   }
 
+  addProduct(product: Product, quantity: number): void {
+    this.items.push(new OrderItem(product, quantity));
+  }
+
   setCoupon(coupon: Coupon): void {
     this.coupon = coupon;
   }
 
-  calculateFinalTotalAmountByProducts(products: Product[]): void {
-    if (products.length !== this.items.length)
-      throw new OrderSolicitationException({
-        type: OrderSolicitationExceptionType.PRODUCTS_LIST_DIFFER_ITEMS_LIST_FROM_AMOUNT_CALCULATION,
-      });
-    const itemsAndProductsPopulated = new Array<OrderItem>();
-    this.items.forEach((item: OrderItem) => {
-      const product = products.find((p: Product) => p.isEqualById(item.product));
-      if (!product)
-        throw new OrderSolicitationException({
-          type: OrderSolicitationExceptionType.PRODUCT_NOT_FOUND_FROM_AMOUNT_CALCULATION,
-        });
-      itemsAndProductsPopulated.push(new OrderItem(product, item.quantity));
-      this.finalTotalAmount += item.quantity * product.basePrice;
-    });
-    this.items = itemsAndProductsPopulated;
+  calculateFinalTotalAmount(): void {
+    this.finalTotalAmount = this.items.reduce((amount, item: OrderItem) => {
+      return amount + item.quantity * item.product.basePrice;
+    }, 0);
     this.applyDiscountOverFinalAmount();
     this.applyFreightOverFinalAmount();
   }
@@ -68,8 +72,6 @@ export default class OrderSolicitation {
   }
 
   private applyFreightOverFinalAmount(): void {
-    this.freight = new Freight(1000);
-    this.freight.calculateCost(this.items.map(({ product }: OrderItem) => product.getMeasurements()));
     this.finalTotalAmount += this.freight.getCost();
   }
 
@@ -85,11 +87,5 @@ export default class OrderSolicitation {
     return this.items.some((item: OrderItem, itemIndex: number, arr: OrderItem[]) =>
       arr.some(({ product }: OrderItem, index: number) => product.isEqualById(item.product) && index != itemIndex),
     );
-  }
-
-  private validateCreation(): void {
-    if (this.hasRepeatedOrderItem()) {
-      throw new OrderSolicitationException({ type: OrderSolicitationExceptionType.INVALID_QUANTITY });
-    }
   }
 }

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ProductDatabaseInterface, PRODUCT_DATABASE } from '../../adapters/storage/data/ProductDatabaseInterface';
 import { ProductRepositoryInterface } from './ProductRepositoryInterface';
-import Product from '../model/Product';
-import { Measurements } from '../model/Measurements';
+import Product from '../entities/Product';
+import { Measurements } from '../entities/Measurements';
 
 @Injectable()
 export class ProductRepository implements ProductRepositoryInterface {

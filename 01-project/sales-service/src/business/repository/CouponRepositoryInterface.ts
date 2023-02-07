@@ -1,4 +1,4 @@
-import Coupon from '../model/Coupon';
+import Coupon from '../entities/Coupon';
 
 export const COUPON_REPOSITORY = 'COUPON REPOSITORY';
 

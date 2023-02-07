@@ -1,4 +1,4 @@
-import Product from '../model/Product';
+import Product from '../entities/Product';
 
 export const PRODUCT_REPOSITORY = 'PRODUCT REPOSITORY';
 

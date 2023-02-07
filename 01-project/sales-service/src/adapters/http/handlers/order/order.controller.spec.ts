@@ -1,15 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { COUPON_REPOSITORY } from '../../../../business/repository/CouponRepositoryInterface';
 import { PRODUCT_REPOSITORY } from '../../../../business/repository/ProductRepositoryInterface';
-import { OrderSolicitationService } from './../../../../business/service/OrderSolicitationService';
+import { FreightService } from '../../../../business/service/FreightService';
+import { FREIGHT_SERVICE } from '../../../../business/service/FreightServiceInterface';
+import { OrderSolicitationService } from '../../../../business/service/OrderSolicitationService';
 import {
   OrderSolicitationServiceInterface,
   ORDER_SOLICITATION_SERVICE,
-} from './../../../../business/service/OrderSolicitationServiceInterface';
+} from '../../../../business/service/OrderSolicitationServiceInterface';
 import {
-  OrderSolicitationPreviewPayloadRequest,
-  OrderSolicitationPreviewPayloadResponse,
-} from './dto/OrderSolicitationPreviewPayload';
+  OrderSolicitationPreviewPayloadInput,
+  OrderSolicitationPreviewPayloadOutput,
+} from '../../../../business/entities/dto/OrderSolicitationPreviewPayload';
 import { OrderControllerV1 } from './order.controller';
 
 describe('Controller:OrderV1', () => {
@@ -23,6 +25,7 @@ describe('Controller:OrderV1', () => {
         { provide: ORDER_SOLICITATION_SERVICE, useClass: OrderSolicitationService },
         { provide: PRODUCT_REPOSITORY, useValue: () => Promise.resolve() },
         { provide: COUPON_REPOSITORY, useValue: () => Promise.resolve() },
+        { provide: FREIGHT_SERVICE, useClass: FreightService },
       ],
     }).compile();
 
@@ -38,8 +41,8 @@ describe('Controller:OrderV1', () => {
     it('should calculate total order amount', async () => {
       const calculatePreviewMock = jest
         .spyOn(orderSolicitationService, 'calculatePreview')
-        .mockImplementation(() => Promise.resolve(new OrderSolicitationPreviewPayloadResponse(100, 10)));
-      await orderController.solicitationPreview(new OrderSolicitationPreviewPayloadRequest([]));
+        .mockImplementation(() => Promise.resolve(new OrderSolicitationPreviewPayloadOutput(100, 10)));
+      await orderController.solicitationPreview(new OrderSolicitationPreviewPayloadInput([]));
       expect(calculatePreviewMock).toBeCalledTimes(1);
     });
   });

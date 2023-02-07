@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CouponDatabaseInterface, COUPON_DATABASE } from '../../adapters/storage/data/CouponDatabaseInterface';
 import { CouponRepositoryInterface } from './CouponRepositoryInterface';
-import Coupon from '../model/Coupon';
+import Coupon from '../entities/Coupon';
 
 @Injectable()
 export class CouponRepository implements CouponRepositoryInterface {

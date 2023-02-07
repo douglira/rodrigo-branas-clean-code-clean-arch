@@ -1,12 +1,12 @@
 import {
-  OrderSolicitationPreviewPayloadRequest,
-  OrderSolicitationPreviewPayloadResponse,
-} from '../../adapters/http/handlers/order/dto/OrderSolicitationPreviewPayload';
+  OrderSolicitationPreviewPayloadInput,
+  OrderSolicitationPreviewPayloadOutput,
+} from '../entities/dto/OrderSolicitationPreviewPayload';
 
 export const ORDER_SOLICITATION_SERVICE = 'ORDER SOLICITATION SERVICE';
 
 export interface OrderSolicitationServiceInterface {
   calculatePreview(
-    orderSolicitationPayload: OrderSolicitationPreviewPayloadRequest,
-  ): Promise<OrderSolicitationPreviewPayloadResponse>;
+    orderSolicitationPayload: OrderSolicitationPreviewPayloadInput,
+  ): Promise<OrderSolicitationPreviewPayloadOutput>;
 }

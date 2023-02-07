@@ -15,9 +15,9 @@ import {
   ORDER_SOLICITATION_SERVICE,
 } from './../../../../business/service/OrderSolicitationServiceInterface';
 import {
-  OrderSolicitationPreviewPayloadRequest,
-  OrderSolicitationPreviewPayloadResponse,
-} from './dto/OrderSolicitationPreviewPayload';
+  OrderSolicitationPreviewPayloadInput,
+  OrderSolicitationPreviewPayloadOutput,
+} from '../../../../business/entities/dto/OrderSolicitationPreviewPayload';
 
 @Controller({
   path: 'orders',
@@ -34,8 +34,8 @@ export class OrderControllerV1 {
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true }))
   async solicitationPreview(
-    @Body() body: OrderSolicitationPreviewPayloadRequest,
-  ): Promise<OrderSolicitationPreviewPayloadResponse> {
+    @Body() body: OrderSolicitationPreviewPayloadInput,
+  ): Promise<OrderSolicitationPreviewPayloadOutput> {
     return this.orderSolicitation.calculatePreview(body);
   }
 }
