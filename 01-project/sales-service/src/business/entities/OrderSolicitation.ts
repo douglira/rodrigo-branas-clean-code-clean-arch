@@ -5,6 +5,7 @@ import OrderItem from './OrderItem';
 import Product from './Product';
 
 export default class OrderSolicitation {
+  private cpf: string;
   private finalTotalAmount: number;
   private items: Array<OrderItem>;
   private coupon: Coupon;
@@ -27,6 +28,14 @@ export default class OrderSolicitation {
 
   private addFreightCost(): void {
     this.finalTotalAmount += this.freight.getCost();
+  }
+
+  setCpf(cpf: string): void {
+    this.cpf = cpf;
+  }
+
+  getCpf(): string {
+    return this.cpf;
   }
 
   getItems(): OrderItem[] {

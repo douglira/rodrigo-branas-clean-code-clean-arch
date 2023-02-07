@@ -47,9 +47,7 @@ export class OrderSolicitationService implements OrderSolicitationServiceInterfa
     new Coupon();
   }
 
-  async calculatePreview(
-    orderSolicitationPayload: OrderSolicitationPreviewPayloadInput,
-  ): Promise<OrderSolicitationPreviewPayloadOutput> {
+  async generate(orderSolicitationPayload: OrderSolicitationPreviewPayloadInput): Promise<OrderSolicitation> {
     const [orderItems, coupon] = await Promise.all([
       this.getOrderItemsWithProducts(orderSolicitationPayload),
       this.getCoupon(orderSolicitationPayload),
@@ -59,7 +57,15 @@ export class OrderSolicitationService implements OrderSolicitationServiceInterfa
       coupon,
       this.freightService.getCalculationFromOrderItems(orderItems, 1000),
     );
+    orderSolicitation.setCpf(orderSolicitationPayload.cpf);
     orderSolicitation.calculateFinalTotalAmount();
+    return orderSolicitation;
+  }
+
+  async calculatePreview(
+    orderSolicitationPayload: OrderSolicitationPreviewPayloadInput,
+  ): Promise<OrderSolicitationPreviewPayloadOutput> {
+    const orderSolicitation = await this.generate(orderSolicitationPayload);
     return new OrderSolicitationPreviewPayloadOutput(
       orderSolicitation.getFinalTotalAmount(),
       orderSolicitation.getFreightCost(),

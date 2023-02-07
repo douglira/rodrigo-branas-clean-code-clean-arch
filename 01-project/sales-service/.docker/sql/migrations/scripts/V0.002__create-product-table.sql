@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS sales_service.products (
   width numeric NOT NULL,
   depth numeric NOT NULL,
   "weight" numeric NOT NULL,
-  CONSTRAINT product_pkey PRIMARY KEY (id)
+  CONSTRAINT products_pkey PRIMARY KEY (id)
 );

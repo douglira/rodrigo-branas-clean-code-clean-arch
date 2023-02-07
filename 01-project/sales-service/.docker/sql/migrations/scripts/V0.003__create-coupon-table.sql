@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS sales_service.coupons (
   "name" text NOT NULL,
   discount numeric NOT NULL,
   expires_in timestamp NOT NULL,
-  CONSTRAINT coupon_pkey PRIMARY KEY (id)
+  CONSTRAINT coupons_pkey PRIMARY KEY (id)
 );
