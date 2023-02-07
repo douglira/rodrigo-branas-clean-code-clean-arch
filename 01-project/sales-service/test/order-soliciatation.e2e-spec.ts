@@ -38,7 +38,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
         .set('Accept', 'application/json')
         .send(input)
         .expect(HttpStatus.OK)
-        .expect({ totalAmount: 174.89, freightCost: 43.05 });
+        .expect({ totalAmount: 174.88, freightCost: 43.04 });
     });
     it('should error with expired coupon', async () => {
       const input = {

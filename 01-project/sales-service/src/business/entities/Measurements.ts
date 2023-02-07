@@ -19,7 +19,12 @@ export class Measurements {
     this.density = this.weight / this.getVolume(MeasurementCubicFactor.METERS);
   }
 
-  isValidDimensions(): boolean {
+  private validateCreation() {
+    if (!this.isValidDimensions())
+      throw new MeasurementsException({ type: MeasurementsExceptionType.INVALID_MEASUREMENTS });
+  }
+
+  private isValidDimensions(): boolean {
     return this.width >= 0 && this.height >= 0 && this.depth >= 0 && this.weight >= 0;
   }
 
@@ -29,10 +34,5 @@ export class Measurements {
 
   getDensity(): number {
     return this.density;
-  }
-
-  private validateCreation() {
-    if (!this.isValidDimensions())
-      throw new MeasurementsException({ type: MeasurementsExceptionType.INVALID_MEASUREMENTS });
   }
 }

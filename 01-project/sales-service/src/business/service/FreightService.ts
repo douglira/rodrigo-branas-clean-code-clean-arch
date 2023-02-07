@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Freight } from '../entities/Freight';
+import Freight from '../entities/Freight';
 import OrderItem from '../entities/OrderItem';
 import { FreightServiceInterface } from './FreightServiceInterface';
 

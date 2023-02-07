@@ -1,6 +1,6 @@
 import { OrderSolicitationException, OrderSolicitationExceptionType } from '../exceptions/OrderSolicitationException';
 import Coupon from './Coupon';
-import { Freight } from './Freight';
+import Freight from './Freight';
 import OrderItem from './OrderItem';
 import Product from './Product';
 
