@@ -20,6 +20,8 @@ import {
 } from '../../../../business/service/OrderProcessorServiceInterface';
 import { ORDER_REPOSITORY } from '../../../../business/repository/OrderRepositoryInterface';
 import { OrderProcessorOutput } from '../../../../business/entities/dto/OrderProcessorRegisterPayload';
+import { ORDER_ITEM_SERVICE } from '../../../../business/service/OrderItemServiceInterface';
+import { OrderItemService } from '../../../../business/service/OrderItemService';
 
 describe('Controller:OrderV1', () => {
   let orderController: OrderControllerV1;
@@ -32,6 +34,7 @@ describe('Controller:OrderV1', () => {
       providers: [
         { provide: ORDER_SOLICITATION_SERVICE, useClass: OrderSolicitationService },
         { provide: ORDER_PROCESSOR_SERVICE, useClass: OrderProcessorService },
+        { provide: ORDER_ITEM_SERVICE, useClass: OrderItemService },
         { provide: PRODUCT_REPOSITORY, useValue: () => Promise.resolve() },
         { provide: COUPON_REPOSITORY, useValue: () => Promise.resolve() },
         { provide: ORDER_REPOSITORY, useValue: () => Promise.resolve() },

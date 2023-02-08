@@ -9,7 +9,7 @@ import Coupon from '../entities/Coupon';
 import { CouponRepositoryInterface, COUPON_REPOSITORY } from '../repository/CouponRepositoryInterface';
 import { CouponRepository } from '../repository/CouponRepository';
 import { COUPON_DATABASE } from '../../adapters/storage/data/CouponDatabaseInterface';
-import { OrderItemDTO, OrderSolicitationPreviewPayloadInput } from '../entities/dto/OrderSolicitationPreviewPayload';
+import { OrderSolicitationPreviewPayloadInput } from '../entities/dto/OrderSolicitationPreviewPayload';
 import { Measurements } from '../entities/Measurements';
 import { FREIGHT_SERVICE } from './FreightServiceInterface';
 import { FreightService } from './FreightService';
@@ -19,6 +19,9 @@ import { OrderRepositoryInterface, ORDER_REPOSITORY } from '../repository/OrderR
 import { OrderRepository } from '../repository/OrderRepository';
 import { ORDER_DATABASE } from '../../adapters/storage/data/OrderDatabaseInterface';
 import { OrderProcessorService } from './OrderProcessorService';
+import { OrderItemInput } from '../entities/dto/OrderItemInput';
+import { OrderItemService } from './OrderItemService';
+import { ORDER_ITEM_SERVICE } from './OrderItemServiceInterface';
 
 describe('Service:OrderProcessor', () => {
   let orderProcessorService: OrderProcessorServiceInterface;
@@ -33,6 +36,7 @@ describe('Service:OrderProcessor', () => {
         { provide: ORDER_PROCESSOR_SERVICE, useClass: OrderProcessorService },
         { provide: ORDER_SOLICITATION_SERVICE, useClass: OrderSolicitationService },
         { provide: PRODUCT_REPOSITORY, useClass: ProductRepository },
+        { provide: ORDER_ITEM_SERVICE, useClass: OrderItemService },
         { provide: PRODUCT_DATABASE, useValue: () => Promise.resolve() },
         { provide: COUPON_REPOSITORY, useClass: CouponRepository },
         { provide: COUPON_DATABASE, useValue: () => Promise.resolve() },
@@ -54,7 +58,7 @@ describe('Service:OrderProcessor', () => {
   });
 
   it('should register order and generate an identifier order code', async () => {
-    const items = new Array<OrderItemDTO>(new OrderItemDTO('ID1', 3), new OrderItemDTO('ID2', 1));
+    const items = new Array<OrderItemInput>(new OrderItemInput('ID1', 3), new OrderItemInput('ID2', 1));
     const couponCode = 'VALE30';
     const orderSolicitationInput = new OrderSolicitationPreviewPayloadInput(items, couponCode);
     const productRepositoryMock = jest

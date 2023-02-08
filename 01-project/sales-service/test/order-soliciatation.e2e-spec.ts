@@ -38,7 +38,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
         .set('Accept', 'application/json')
         .send(input)
         .expect(HttpStatus.OK)
-        .expect({ totalAmount: 174.88, freightCost: 43.04 });
+        .expect({ totalAmount: 178.84, freightCost: 47 });
     });
     it('should error with expired coupon', async () => {
       const input = {
@@ -90,11 +90,11 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
       .post('/orders/solicitation-preview')
       .set('Accept', 'application/json')
       .send(input);
-    expect(result.statusCode).toEqual(HttpStatus.CONFLICT);
+    expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
     expect(result.body).toMatchObject({
-      type: 'INVALID_QUANTITY',
-      code: 'OSET1000',
-      timestamp: expect.stringMatching(timestampRegexMatching),
+      error: 'Bad Request',
+      message: ['Invalid products'],
+      statusCode: 400,
     });
   });
 

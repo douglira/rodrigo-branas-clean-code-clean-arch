@@ -16,9 +16,7 @@ export default class Freight {
 
   calculateMeasurementsCost(measurements: Measurements): number {
     const cost =
-      this.distance *
-      measurements.getVolume(MeasurementCubicFactor.METERS) *
-      (Math.floor(measurements.getDensity()) / 100);
+      this.distance * measurements.getVolume(MeasurementCubicFactor.METERS) * (measurements.getDensity() / 100);
     return NumberFormatter.currency(Math.max(cost, this.MIN_COST_MEASUREMENTS));
   }
 

@@ -4,43 +4,32 @@ import {
   OrderSolicitationExceptionType,
 } from '../../exceptions/OrderSolicitationException';
 import { CpfValidator } from '../../validators/CpfValidator';
+import { RepeatedOrderItemProductsValidator } from '../../validators/RepeatedOrderItemProductsValidator';
 import OrderItem from '../OrderItem';
 import Product from '../Product';
-
-export class OrderItemDTO {
-  productId: string;
-  quantity: number;
-
-  constructor(productId?: string, quantity?: number) {
-    this.productId = productId;
-    this.quantity = quantity;
-  }
-}
+import { OrderItemInput } from './OrderItemInput';
 
 export class OrderSolicitationPreviewPayloadInput {
   @Validate(CpfValidator)
   cpf: string;
-  orderItems: Array<OrderItemDTO>;
+
+  @Validate(RepeatedOrderItemProductsValidator)
+  orderItems: Array<OrderItemInput>;
+
   coupon: string;
-  constructor(orderItems?: Array<OrderItemDTO>, coupon?: string) {
+  constructor(orderItems?: Array<OrderItemInput>, coupon?: string) {
     this.orderItems = orderItems;
     this.coupon = coupon;
   }
 
   static getOrderItems(body: OrderSolicitationPreviewPayloadInput): OrderItem[] {
-    if (OrderSolicitationPreviewPayloadInput.hasRepeatedOrderItem(body.orderItems)) {
+    if (OrderItemInput.hasRepeatedOrderItem(body.orderItems)) {
       throw new OrderSolicitationException({ type: OrderSolicitationExceptionType.INVALID_QUANTITY });
     }
-    return body.orderItems.map<OrderItem>((item: OrderItemDTO) => {
+    return body.orderItems.map<OrderItem>((item: OrderItemInput) => {
       const product = new Product(item.productId);
       return new OrderItem(product, item.quantity);
     });
-  }
-
-  static hasRepeatedOrderItem(items: OrderItemDTO[]): boolean {
-    return items.some((item: OrderItemDTO, itemIndex: number, arr: OrderItemDTO[]) =>
-      arr.some(({ productId }: OrderItemDTO, index: number) => productId == item.productId && index != itemIndex),
-    );
   }
 }
 
