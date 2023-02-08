@@ -97,4 +97,8 @@ export default class OrderSolicitation {
       arr.some(({ product }: OrderItem, index: number) => product.isEqualById(item.product) && index != itemIndex),
     );
   }
+
+  getCouponId(): string {
+    if (this.hasCoupon()) return this.coupon.id;
+  }
 }

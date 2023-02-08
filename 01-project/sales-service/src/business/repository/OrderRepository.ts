@@ -11,10 +11,9 @@ export class OrderRepository implements OrderRepositoryInterface {
   async create(orderSolicitaiton: OrderSolicitation): Promise<OrderRepresentation> {
     const order = {
       cpf: orderSolicitaiton.getCpf(),
-      serialCode: '202300000001',
       totalAmount: orderSolicitaiton.getFinalTotalAmount(),
       freightPrice: orderSolicitaiton.getFreightCost(),
-      couponId: orderSolicitaiton.getCoupon().id,
+      couponId: orderSolicitaiton.getCouponId(),
       items: orderSolicitaiton.getItems().map((item) => ({
         productId: item.product.id,
         quantity: item.quantity,
