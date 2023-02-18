@@ -1,50 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { COUPON_REPOSITORY } from '../../../../business/repository/CouponRepositoryInterface';
 import { PRODUCT_REPOSITORY } from '../../../../business/repository/ProductRepositoryInterface';
-import { FreightService } from '../../../../business/service/FreightService';
-import { FREIGHT_SERVICE } from '../../../../business/service/FreightServiceInterface';
-import { OrderSolicitationService } from '../../../../business/service/OrderSolicitationService';
-import {
-  OrderSolicitationServiceInterface,
-  ORDER_SOLICITATION_SERVICE,
-} from '../../../../business/service/OrderSolicitationServiceInterface';
 import {
   OrderSolicitationPreviewPayloadInput,
   OrderSolicitationPreviewPayloadOutput,
 } from '../../../../business/entities/dto/OrderSolicitationPreviewPayload';
 import { OrderControllerV1 } from './order.controller';
-import { OrderProcessorService } from '../../../../business/service/OrderProcessorService';
-import {
-  OrderProcessorServiceInterface,
-  ORDER_PROCESSOR_SERVICE,
-} from '../../../../business/service/OrderProcessorServiceInterface';
 import { ORDER_REPOSITORY } from '../../../../business/repository/OrderRepositoryInterface';
 import { OrderProcessorOutput } from '../../../../business/entities/dto/OrderProcessorRegisterPayload';
-import { ORDER_ITEM_SERVICE } from '../../../../business/service/OrderItemServiceInterface';
-import { OrderItemService } from '../../../../business/service/OrderItemService';
+import {
+  CHECKOUT_ORDER_SOLICITATION,
+  CheckoutOrderSolicitationInterface,
+} from '../../../../business/usecase/checkout/CheckoutOrderSolicitationInterface';
+import { CheckoutOrderSolicitation } from '../../../../business/usecase/checkout/CheckoutOrderSolicitation';
 
 describe('Controller:OrderV1', () => {
   let orderController: OrderControllerV1;
-  let orderSolicitationService: OrderSolicitationServiceInterface;
-  let orderProcessorService: OrderProcessorServiceInterface;
+  let checkoutOrderSolicitation: CheckoutOrderSolicitationInterface;
 
   beforeEach(async () => {
     const controllerRefTestModule: TestingModule = await Test.createTestingModule({
       controllers: [OrderControllerV1],
       providers: [
-        { provide: ORDER_SOLICITATION_SERVICE, useClass: OrderSolicitationService },
-        { provide: ORDER_PROCESSOR_SERVICE, useClass: OrderProcessorService },
-        { provide: ORDER_ITEM_SERVICE, useClass: OrderItemService },
+        { provide: CHECKOUT_ORDER_SOLICITATION, useClass: CheckoutOrderSolicitation },
         { provide: PRODUCT_REPOSITORY, useValue: () => Promise.resolve() },
         { provide: COUPON_REPOSITORY, useValue: () => Promise.resolve() },
         { provide: ORDER_REPOSITORY, useValue: () => Promise.resolve() },
-        { provide: FREIGHT_SERVICE, useClass: FreightService },
       ],
     }).compile();
 
     orderController = await controllerRefTestModule.resolve(OrderControllerV1);
-    orderSolicitationService = await controllerRefTestModule.resolve(ORDER_SOLICITATION_SERVICE);
-    orderProcessorService = await controllerRefTestModule.resolve(ORDER_PROCESSOR_SERVICE);
+    checkoutOrderSolicitation = await controllerRefTestModule.resolve(CHECKOUT_ORDER_SOLICITATION);
   });
 
   afterEach(() => {
@@ -54,18 +40,18 @@ describe('Controller:OrderV1', () => {
   describe('solicitationPreview', () => {
     it('should calculate total order amount', async () => {
       const calculatePreviewMock = jest
-        .spyOn(orderSolicitationService, 'calculatePreview')
+        .spyOn(checkoutOrderSolicitation, 'preview')
         .mockImplementation(() => Promise.resolve(new OrderSolicitationPreviewPayloadOutput(100, 10)));
-      await orderController.solicitationPreview(new OrderSolicitationPreviewPayloadInput([]));
+      await orderController.preview(new OrderSolicitationPreviewPayloadInput([]));
       expect(calculatePreviewMock).toBeCalledTimes(1);
     });
   });
   describe('register', () => {
     it('should register an order', async () => {
       const registerMock = jest
-        .spyOn(orderProcessorService, 'register')
+        .spyOn(checkoutOrderSolicitation, 'execute')
         .mockImplementation(() => Promise.resolve(new OrderProcessorOutput('100')));
-      await orderController.register(new OrderSolicitationPreviewPayloadInput([]));
+      await orderController.checkout(new OrderSolicitationPreviewPayloadInput([]));
       expect(registerMock).toBeCalledTimes(1);
     });
   });

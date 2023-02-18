@@ -17,7 +17,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
     await app.init();
   });
 
-  describe('/v1/orders/solicitation-preview (POST)', () => {
+  describe('/v1/orders/preview (POST)', () => {
     it('should success with 2 order items and 1 coupon', () => {
       const input = {
         cpf: '423.655.858-09',
@@ -34,7 +34,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
         ],
       };
       return request(app.getHttpServer())
-        .post('/orders/solicitation-preview')
+        .post('/orders/preview')
         .set('Accept', 'application/json')
         .send(input)
         .expect(HttpStatus.OK)
@@ -56,7 +56,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
         ],
       };
       const result = await request(app.getHttpServer())
-        .post('/orders/solicitation-preview')
+        .post('/orders/preview')
         .set('Accept', 'application/json')
         .send(input);
       expect(result.statusCode).toEqual(HttpStatus.CONFLICT);
@@ -87,7 +87,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
       ],
     };
     const result = await request(app.getHttpServer())
-      .post('/orders/solicitation-preview')
+      .post('/orders/preview')
       .set('Accept', 'application/json')
       .send(input);
     expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);

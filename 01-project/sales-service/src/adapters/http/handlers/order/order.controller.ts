@@ -2,27 +2,23 @@ import {
   Controller,
   Post,
   Body,
-  Inject,
   UsePipes,
   ValidationPipe,
   UseFilters,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { BusinessExceptionFilter } from '../../exceptions/BusinessExceptionFilter';
-import {
-  OrderSolicitationServiceInterface,
-  ORDER_SOLICITATION_SERVICE,
-} from './../../../../business/service/OrderSolicitationServiceInterface';
 import {
   OrderSolicitationPreviewPayloadInput,
   OrderSolicitationPreviewPayloadOutput,
 } from '../../../../business/entities/dto/OrderSolicitationPreviewPayload';
-import {
-  OrderProcessorServiceInterface,
-  ORDER_PROCESSOR_SERVICE,
-} from '../../../../business/service/OrderProcessorServiceInterface';
 import { OrderProcessorOutput } from '../../../../business/entities/dto/OrderProcessorRegisterPayload';
+import {
+  CHECKOUT_ORDER_SOLICITATION,
+  CheckoutOrderSolicitationInterface,
+} from '../../../../business/usecase/checkout/CheckoutOrderSolicitationInterface';
 
 @Controller({
   path: 'orders',
@@ -31,23 +27,20 @@ import { OrderProcessorOutput } from '../../../../business/entities/dto/OrderPro
 @UseFilters(BusinessExceptionFilter)
 export class OrderControllerV1 {
   constructor(
-    @Inject(ORDER_SOLICITATION_SERVICE) private readonly orderSolicitation: OrderSolicitationServiceInterface,
-    @Inject(ORDER_PROCESSOR_SERVICE) private readonly orderProcessor: OrderProcessorServiceInterface,
+    @Inject(CHECKOUT_ORDER_SOLICITATION) private readonly checkoutOrderSolicitation: CheckoutOrderSolicitationInterface,
   ) {}
 
-  @Post('solicitation-preview')
+  @Post('preview')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true }))
-  async solicitationPreview(
-    @Body() body: OrderSolicitationPreviewPayloadInput,
-  ): Promise<OrderSolicitationPreviewPayloadOutput> {
-    return this.orderSolicitation.calculatePreview(body);
+  async preview(@Body() body: OrderSolicitationPreviewPayloadInput): Promise<OrderSolicitationPreviewPayloadOutput> {
+    return this.checkoutOrderSolicitation.preview(body);
   }
 
-  @Post('register')
+  @Post('checkout')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true }))
-  async register(@Body() body: OrderSolicitationPreviewPayloadInput): Promise<OrderProcessorOutput> {
-    return this.orderProcessor.register(body);
+  async checkout(@Body() body: OrderSolicitationPreviewPayloadInput): Promise<OrderProcessorOutput> {
+    return this.checkoutOrderSolicitation.execute(body);
   }
 }

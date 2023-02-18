@@ -10,9 +10,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { BusinessExceptionFilter } from '../../exceptions/BusinessExceptionFilter';
-import { FreightServiceInterface, FREIGHT_SERVICE } from '../../../../business/service/FreightServiceInterface';
 import { FreightCalculatorOutput } from '../../../../business/entities/dto/FreightCalculatorOutput';
 import { FreightCalculatorInput } from '../../../../business/entities/dto/FreightCalculatorInput';
+import {
+  SIMULATE_FREIGHT,
+  SimulateFreightInterface,
+} from '../../../../business/usecase/freight/SimulateFreightInterface';
 
 @Controller({
   path: 'freight',
@@ -20,12 +23,12 @@ import { FreightCalculatorInput } from '../../../../business/entities/dto/Freigh
 })
 @UseFilters(BusinessExceptionFilter)
 export class FreightControllerV1 {
-  constructor(@Inject(FREIGHT_SERVICE) private readonly freightService: FreightServiceInterface) {}
+  constructor(@Inject(SIMULATE_FREIGHT) private readonly simulateFreight: SimulateFreightInterface) {}
 
   @Post('calculate')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true }))
   async calculate(@Body() body: FreightCalculatorInput): Promise<FreightCalculatorOutput> {
-    return this.freightService.calculateByProducts(body.items, 1000);
+    return this.simulateFreight.execute(body);
   }
 }
