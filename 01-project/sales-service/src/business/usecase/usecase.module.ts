@@ -11,6 +11,8 @@ import { GET_ORDER } from './order/GetOrderInterface';
 import { LIST_USER_ORDERS } from './order/ListUserOrdersInterface';
 import { ListUserOrders } from './order/ListUserOrders';
 import { GatewayModule } from '../../adapters/gateway/gateway.module';
+import { GENERATE_ORDER_SOLICITATION } from './order/GenerateOrderSolicitationInterace';
+import { GenerateOrderSolicitation } from './order/GenerateOrderSolicitation';
 
 @Module({
   imports: [RepositoryModule, GatewayModule],
@@ -20,6 +22,7 @@ import { GatewayModule } from '../../adapters/gateway/gateway.module';
     { provide: VALIDATE_COUPON_EXPIRATION, useClass: ValidateCouponExpiration },
     { provide: GET_ORDER, useClass: GetOrder },
     { provide: LIST_USER_ORDERS, useClass: ListUserOrders },
+    { provide: GENERATE_ORDER_SOLICITATION, useClass: GenerateOrderSolicitation },
   ],
   exports: [
     { provide: CHECKOUT_ORDER_SOLICITATION, useClass: CheckoutOrderSolicitation },
@@ -27,6 +30,7 @@ import { GatewayModule } from '../../adapters/gateway/gateway.module';
     { provide: VALIDATE_COUPON_EXPIRATION, useClass: ValidateCouponExpiration },
     { provide: GET_ORDER, useClass: GetOrder },
     { provide: LIST_USER_ORDERS, useClass: ListUserOrders },
+    { provide: GENERATE_ORDER_SOLICITATION, useClass: GenerateOrderSolicitation },
   ],
 })
 export class UseCaseModule {}

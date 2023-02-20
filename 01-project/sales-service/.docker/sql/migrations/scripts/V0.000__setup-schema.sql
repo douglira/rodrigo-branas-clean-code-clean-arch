@@ -1,10 +1,11 @@
 CREATE SCHEMA IF NOT EXISTS sales_service;
 
-CREATE EXTENSION
-IF NOT EXISTS "uuid-ossp" SCHEMA sales_service;
+CREATE EXTENSION IF NOT EXISTS "cube" SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS "earthdistance" SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA pg_catalog;
 
 CREATE TABLE IF NOT EXISTS sales_service.products (
-  id uuid NOT NULL DEFAULT sales_service.uuid_generate_v4(),
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   title TEXT NOT NULL,
   base_price NUMERIC NOT NULL,
   height NUMERIC NOT NULL,
@@ -15,7 +16,7 @@ CREATE TABLE IF NOT EXISTS sales_service.products (
 );
 
 CREATE TABLE IF NOT EXISTS sales_service.coupons (
-  id uuid NOT NULL DEFAULT sales_service.uuid_generate_v4(),
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   "name" TEXT NOT NULL,
   discount NUMERIC NOT NULL,
   expires_in TIMESTAMP NOT NULL,
@@ -23,7 +24,7 @@ CREATE TABLE IF NOT EXISTS sales_service.coupons (
 );
 
 CREATE TABLE IF NOT EXISTS sales_service.orders (
-  id uuid NOT NULL DEFAULT sales_service.uuid_generate_v4(),
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   serial_code TEXT UNIQUE NOT NULL,
   created_at TIMESTAMP NOT NULL,
   cpf TEXT NOT NULL,
@@ -52,7 +53,7 @@ CREATE OR REPLACE FUNCTION sales_service.get_order_serial_number_seq()
 	RETURN (CONCAT(DATE_PART('year', CURRENT_DATE), LPAD((NEXTVAL('sales_service.order_serial_number_seq'))::TEXT, 8, '0')));
 
 CREATE TABLE IF NOT EXISTS sales_service.addresses (
-  id uuid NOT NULL DEFAULT sales_service.uuid_generate_v4(),
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   postal_code TEXT NOT NULL,
   street_number TEXT NOT NULL,
   country TEXT NOT NULL,
@@ -67,7 +68,7 @@ CREATE TABLE IF NOT EXISTS sales_service.addresses (
 );
 
 CREATE TABLE IF NOT EXISTS sales_service.stores (
-  id uuid NOT NULL DEFAULT sales_service.uuid_generate_v4(),
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   "name" TEXT NOT NULL,
   address_id uuid NOT NULL,
   CONSTRAINT stores_pkey PRIMARY KEY (id),

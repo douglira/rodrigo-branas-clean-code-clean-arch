@@ -1,13 +1,14 @@
 import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import { OrderItemInput } from '../entities/dto/OrderItemInput';
 
 @ValidatorConstraint({ name: 'hasRepeatedOrderItemProducts', async: false })
 export class RepeatedOrderItemProductsValidator implements ValidatorConstraintInterface {
-  validate(items: OrderItemInput[]): boolean {
-    return !OrderItemInput.hasRepeatedOrderItem(items);
+  validate(items: any): boolean {
+    return !items.some((item, itemIndex: number, arr) =>
+      arr.some(({ productId }, index: number) => productId === item.productId && index != itemIndex),
+    );
   }
 
   defaultMessage(): string {
-    return 'Invalid products';
+    return 'Duplicated products';
   }
 }

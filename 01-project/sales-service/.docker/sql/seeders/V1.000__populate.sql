@@ -11,4 +11,12 @@ INSERT INTO sales_service.coupons ("id", "name", "discount", "expires_in")
 INSERT INTO sales_service.addresses ("id", "postal_code", "street_number", "country", "city", "neighborhood", "province", "street", "additional_data", "lat", "lng")
   VALUES ('51e02101-c375-47de-8e6e-ba8d028e6d16', '06020010', '1496', 'Brasil', 'Osasco', 'Vila Yara', 'São Paulo', 'Av. dos Autonomistas', NULL, '-23.540866', '-46.76731');
 INSERT INTO sales_service.stores ("id", "name", "address_id")
-  VALUES ('9bfe400a-a15b-496f-ba66-a2e7cb564c1a', 'iSale Garage', '51e02101-c375-47de-8e6e-ba8d028e6d16');
+  VALUES ('9bfe400a-a15b-496f-ba66-a2e7cb564c1a', 'iSale Garage - Osasco', '51e02101-c375-47de-8e6e-ba8d028e6d16');
+INSERT INTO sales_service.addresses ("id", "postal_code", "street_number", "country", "city", "neighborhood", "province", "street", "additional_data", "lat", "lng")
+  VALUES ('1120c184-0a2b-4d93-b0f4-fb2bc46a5f99', '13087460', '660', 'Brasil', 'Campinas', 'Mansões Santo Antônio', 'São Paulo', 'Rua Jasmin', NULL, '-22.854876', '-47.051134');
+INSERT INTO sales_service.stores ("id", "name", "address_id")
+  VALUES ('cbee8e68-6413-486f-b373-e4d3fa7418b1', 'iSale Garage - Campinas', '1120c184-0a2b-4d93-b0f4-fb2bc46a5f99');
+INSERT INTO sales_service.addresses ("id", "postal_code", "street_number", "country", "city", "neighborhood", "province", "street", "additional_data", "lat", "lng")
+  VALUES ('edde3d87-9021-4521-9bfc-9168f033b874', '80230030', '675', 'Brasil', 'Curitiba', 'Rebouças', 'São Paulo', 'Av. Presidente Getúlio Vargas', NULL, '-25.442907', '-49.266557');
+INSERT INTO sales_service.stores ("id", "name", "address_id")
+  VALUES ('a8336065-288f-4c50-96c5-f0c9965b8f81', 'iSale Garage - Curitiba', 'edde3d87-9021-4521-9bfc-9168f033b874');

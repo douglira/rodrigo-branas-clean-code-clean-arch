@@ -27,4 +27,31 @@ export class StoreDatabase implements StoreDatabaseInterface {
       throw err;
     }
   }
+
+  async getNearby(lat: number, lng: number): Promise<any> {
+    try {
+      const queryString = `
+        SELECT
+          stb.id,
+          stb.name,
+          (SELECT ROW_TO_JSON(atb.*) AS address)
+        FROM
+          sales_service.stores stb INNER JOIN sales_service.addresses atb 
+          ON stb.address_id = atb.id
+        ORDER BY (
+          SELECT (
+            (
+              (SELECT point(atb.lat::numeric, atb.lng::numeric) FROM sales_service.addresses WHERE id = atb.id) <@>
+              (SELECT point($(lat)::numeric, $(lng)::numeric))
+            ) * 1.7
+          )
+        ) ASC
+        LIMIT 1
+      `;
+      const result = await this.db.oneOrNone(queryString, { lat, lng });
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
 }

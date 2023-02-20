@@ -1,37 +1,19 @@
 import { OrderSolicitationException, OrderSolicitationExceptionType } from '../exceptions/OrderSolicitationException';
 import Coupon from './Coupon';
-import Freight from './Freight';
 import OrderItem from './OrderItem';
 import Product from './Product';
 
 export default class OrderSolicitation {
-  private cpf: string;
-  private finalTotalAmount: number;
-  private items: Array<OrderItem>;
+  private readonly cpf: string;
+  private items: OrderItem[];
   private coupon: Coupon;
-  private freight: Freight;
+  private freight: number;
 
-  constructor(items: Array<OrderItem> = new Array<OrderItem>(), coupon?: Coupon, freight?: Freight) {
-    this.items = items;
-    this.finalTotalAmount = 0;
-    this.coupon = coupon;
-    this.freight = freight;
-    this.validateCreation();
-    this.addFreightCost();
-  }
-
-  private validateCreation(): void {
-    if (this.hasRepeatedOrderItem()) {
-      throw new OrderSolicitationException({ type: OrderSolicitationExceptionType.INVALID_QUANTITY });
-    }
-  }
-
-  private addFreightCost(): void {
-    this.finalTotalAmount += this.freight.getCost();
-  }
-
-  setCpf(cpf: string): void {
+  constructor(cpf: string) {
     this.cpf = cpf;
+    this.coupon = new Coupon();
+    this.items = [];
+    this.freight = 0;
   }
 
   getCpf(): string {
@@ -42,46 +24,48 @@ export default class OrderSolicitation {
     return this.items;
   }
 
-  getFinalTotalAmount(): number {
-    return this.finalTotalAmount;
-  }
-
   getCoupon(): Coupon {
     return this.coupon;
   }
 
-  getFreightCost(): number {
-    return this.freight.getCost();
+  getFreight(): number {
+    return this.freight;
   }
 
-  addItem(item: OrderItem): void {
-    this.items.push(item);
+  isProductAlreadyExists(product: Product): number {
+    return this.items.findIndex((item) => item.product.isEqualById(product));
   }
 
-  addProduct(product: Product, quantity: number): void {
+  addItem(product: Product, quantity: number): void {
+    const productIndex = this.isProductAlreadyExists(product);
+    if (productIndex != -1) {
+      throw new OrderSolicitationException({
+        type: OrderSolicitationExceptionType.DUPLICATED_PRODUCT,
+      });
+    }
     this.items.push(new OrderItem(product, quantity));
   }
 
   setCoupon(coupon: Coupon): void {
-    this.coupon = coupon;
-  }
-
-  calculateFinalTotalAmount(): void {
-    this.finalTotalAmount = this.items.reduce((amount, item: OrderItem) => {
-      return amount + item.quantity * item.product.basePrice;
-    }, 0);
-    this.applyDiscountOverFinalAmount();
-    this.applyFreightOverFinalAmount();
-  }
-
-  private applyDiscountOverFinalAmount(): void {
-    if (this.coupon) {
-      this.finalTotalAmount -= this.coupon.getDiscountAmount(this.finalTotalAmount);
+    if (coupon) {
+      coupon.validateExpiration();
+      this.coupon = coupon;
     }
   }
 
-  private applyFreightOverFinalAmount(): void {
-    this.finalTotalAmount += this.freight.getCost();
+  setFreight(cost: number): void {
+    this.freight = cost;
+  }
+
+  getTotal(): number {
+    let total = this.items.reduce((amount, item: OrderItem) => {
+      return amount + item.quantity * item.product.basePrice;
+    }, 0);
+    if (this.coupon) {
+      total -= this.coupon.getDiscountAmount(total);
+    }
+    total += this.freight;
+    return total;
   }
 
   hasCouponCode(): boolean {
@@ -90,12 +74,6 @@ export default class OrderSolicitation {
 
   hasCoupon(): boolean {
     return !!this.coupon && this.coupon.hasCoupon();
-  }
-
-  hasRepeatedOrderItem(): boolean {
-    return this.items.some((item: OrderItem, itemIndex: number, arr: OrderItem[]) =>
-      arr.some(({ product }: OrderItem, index: number) => product.isEqualById(item.product) && index != itemIndex),
-    );
   }
 
   getCouponId(): string {
