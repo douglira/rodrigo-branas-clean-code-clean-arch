@@ -1,0 +1,18 @@
+http:
+  host: 'localhost'
+  port: 3000
+
+db:
+  postgres:
+    url: '0.0.0.0'
+    port: 5432
+    database: 'sales_service'
+    auth_user:
+    auth_pswd:
+    pool:
+      max: 10
+      idle_timeout_millis: 30000
+      connection_timeout_millis: 2000
+
+google:
+  api_key:

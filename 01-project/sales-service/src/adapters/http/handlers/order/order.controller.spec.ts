@@ -13,6 +13,8 @@ import {
   CheckoutOrderSolicitationInterface,
 } from '../../../../business/usecase/checkout/CheckoutOrderSolicitationInterface';
 import { CheckoutOrderSolicitation } from '../../../../business/usecase/checkout/CheckoutOrderSolicitation';
+import { GetOrder } from '../../../../business/usecase/order/GetOrder';
+import { GET_ORDER } from '../../../../business/usecase/order/GetOrderInterface';
 
 describe('Controller:OrderV1', () => {
   let orderController: OrderControllerV1;
@@ -23,6 +25,7 @@ describe('Controller:OrderV1', () => {
       controllers: [OrderControllerV1],
       providers: [
         { provide: CHECKOUT_ORDER_SOLICITATION, useClass: CheckoutOrderSolicitation },
+        { provide: GET_ORDER, useClass: GetOrder },
         { provide: PRODUCT_REPOSITORY, useValue: () => Promise.resolve() },
         { provide: COUPON_REPOSITORY, useValue: () => Promise.resolve() },
         { provide: ORDER_REPOSITORY, useValue: () => Promise.resolve() },

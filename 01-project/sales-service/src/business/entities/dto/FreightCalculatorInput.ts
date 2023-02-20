@@ -5,4 +5,6 @@ import { OrderItemInput } from './OrderItemInput';
 export class FreightCalculatorInput {
   @Validate(RepeatedOrderItemProductsValidator)
   items: OrderItemInput[];
+  addresseePostalCode: string;
+  storeId: string;
 }

@@ -26,6 +26,9 @@
       "runtimeArgs": [
         "run",
         "test:debug",
+        "--",
+        "--watch",
+        "--verbose"
       ],
       "autoAttachChildProcesses": true,
       "restart": true,

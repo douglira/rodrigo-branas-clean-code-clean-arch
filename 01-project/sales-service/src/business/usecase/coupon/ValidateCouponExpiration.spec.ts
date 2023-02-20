@@ -11,15 +11,15 @@ describe('UseCase:ValidateCouponExpiration', () => {
   let couponRepository: CouponRepositoryInterface;
 
   beforeEach(async () => {
-    const serviceRefTestModule: TestingModule = await Test.createTestingModule({
+    const usecaseRefTestModule: TestingModule = await Test.createTestingModule({
       providers: [
         ValidateCouponExpiration,
         { provide: COUPON_REPOSITORY, useClass: CouponRepository },
         { provide: COUPON_DATABASE, useValue: () => Promise.resolve() },
       ],
     }).compile();
-    validateCouponExpiration = await serviceRefTestModule.resolve(ValidateCouponExpiration);
-    couponRepository = await serviceRefTestModule.resolve(COUPON_REPOSITORY);
+    validateCouponExpiration = await usecaseRefTestModule.resolve(ValidateCouponExpiration);
+    couponRepository = await usecaseRefTestModule.resolve(COUPON_REPOSITORY);
   });
 
   it('should verify if coupon code is valid', async () => {

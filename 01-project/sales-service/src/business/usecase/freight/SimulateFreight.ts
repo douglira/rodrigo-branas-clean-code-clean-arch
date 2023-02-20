@@ -11,10 +11,17 @@ import {
 } from '../../exceptions/OrderSolicitationException';
 import { PRODUCT_REPOSITORY, ProductRepositoryInterface } from '../../repository/ProductRepositoryInterface';
 import { FreightCalculatorInput } from '../../entities/dto/FreightCalculatorInput';
+import { GEO_CODING_GATEWAY, GeocodingGateway } from '../../../adapters/gateway/GeocodingGateway';
+import { STORE_REPOSITORY, StoreRepositoryInterface } from '../../repository/StoreRepositoryInterface';
+import { DistanceCalculator, DistanceFactor } from '../../entities/DistanceCalculator';
 
 @Injectable()
 export class SimulateFreight implements SimulateFreightInterface {
-  constructor(@Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface) {}
+  constructor(
+    @Inject(PRODUCT_REPOSITORY) private readonly productRepository: ProductRepositoryInterface,
+    @Inject(GEO_CODING_GATEWAY) private readonly geocodingGateway: GeocodingGateway,
+    @Inject(STORE_REPOSITORY) private readonly storeRepository: StoreRepositoryInterface,
+  ) {}
 
   async getOrderItemsWithProducts(items: OrderItemInput[]): Promise<OrderItem[]> {
     const products = await this.productRepository.findByIds(items.map((item: OrderItemInput) => item.productId));
@@ -52,7 +59,14 @@ export class SimulateFreight implements SimulateFreightInterface {
   }
 
   async execute(input: FreightCalculatorInput): Promise<FreightCalculatorOutput> {
+    const store = await this.storeRepository.get(input.storeId);
+    const AddresseeCoord = await this.geocodingGateway.getLatLgnByPostalCode(input.addresseePostalCode);
+    const distance = DistanceCalculator.calculate(
+      store.address.coord,
+      AddresseeCoord,
+      DistanceFactor.KILOMETERS_TO_METERS,
+    );
     const orderItems = await this.getOrderItemsWithProducts(input.items);
-    return new FreightCalculatorOutput(this.getCalculationFromOrderItems(orderItems, 1000).getCost());
+    return new FreightCalculatorOutput(this.getCalculationFromOrderItems(orderItems, distance).getCost());
   }
 }

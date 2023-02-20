@@ -35,4 +35,62 @@ export class OrderDatabase implements OrderDatabaseInterface {
       throw err;
     }
   }
+
+  async getBySerialCode(serialCode: string): Promise<any> {
+    try {
+      const queryString = `
+        SELECT
+          otb.id,
+          otb.serial_code,
+          timezone('UTC', otb.created_at) AS created_at,
+          otb.cpf,
+          otb.total_amount,
+          otb.freight_price,
+          COALESCE(ctb."name", NULL) AS coupon_code,
+          (
+            SELECT JSON_AGG(JSON_BUILD_OBJECT(
+              'product_id', products.id,
+              'product_title', products.title,
+              'quantity', order_items.quantity,
+              'sold_price', order_items.sold_price
+            ))
+              FROM sales_service.order_items 
+              INNER JOIN sales_service.orders ON order_items.order_id = orders.id
+              INNER JOIN sales_service.products ON order_items.product_id = products.id
+              WHERE order_items.order_id = otb.id
+          ) AS items
+        FROM sales_service.orders otb
+        LEFT JOIN sales_service.coupons ctb ON ctb.id = otb.coupon_id
+        WHERE otb.serial_code = $(serialCode)
+        LIMIT 1
+      `;
+      const result = await this.db.oneOrNone(queryString, { serialCode });
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async findByCpf(cpf: string): Promise<any> {
+    try {
+      const queryString = `
+        SELECT
+          otb.id,
+          otb.serial_code,
+          timezone('UTC', otb.created_at) AS created_at,
+          otb.cpf,
+          otb.total_amount,
+          otb.freight_price,
+          COALESCE(ctb."name", NULL) AS coupon_code
+        FROM sales_service.orders otb
+        LEFT JOIN sales_service.coupons ctb ON ctb.id = otb.coupon_id
+        WHERE otb.cpf = $(cpf)
+        ORDER BY otb.created_at DESC
+      `;
+      const result = await this.db.manyOrNone(queryString, { cpf });
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
 }
