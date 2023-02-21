@@ -22,6 +22,7 @@ import {
   version: '1',
 })
 @UseFilters(BusinessExceptionFilter)
+@UsePipes(new ValidationPipe({ transform: true }))
 export class CouponControllerV1 {
   constructor(
     @Inject(VALIDATE_COUPON_EXPIRATION) private readonly validateCouponExpiration: ValidateCouponExpirationInterface,
@@ -29,7 +30,6 @@ export class CouponControllerV1 {
 
   @Get(':code/validate')
   @HttpCode(HttpStatus.OK)
-  @UsePipes(new ValidationPipe({ transform: true }))
   async calculate(@Param('code') code: string): Promise<CouponCodeValidationOutput> {
     return this.validateCouponExpiration.execute(new CouponCodeValidationInput(code));
   }

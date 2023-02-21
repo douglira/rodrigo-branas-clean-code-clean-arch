@@ -17,6 +17,6 @@ export class CheckoutOrderSolicitation {
   async execute(input: OrderSolicitationInput): Promise<OrderProcessorRegisterOutput> {
     const orderSolicitation = await this.generateOrderSolicitation.execute(input);
     const orderRepresentation = await this.orderRepository.create(orderSolicitation);
-    return new OrderProcessorRegisterOutput(orderRepresentation.getSerialCode());
+    return new OrderProcessorRegisterOutput(orderRepresentation.serialCode, orderRepresentation.createdAt);
   }
 }

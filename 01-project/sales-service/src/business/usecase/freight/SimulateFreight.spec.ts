@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PRODUCT_DATABASE } from '../../../adapters/storage/data/ProductDatabaseInterface';
-import { Measurements } from '../../entities/Measurements';
-import OrderItem from '../../entities/OrderItem';
-import Product from '../../entities/Product';
 import { ProductRepository } from '../../repository/ProductRepository';
-import { ProductRepositoryInterface, PRODUCT_REPOSITORY } from '../../repository/ProductRepositoryInterface';
+import { PRODUCT_REPOSITORY } from '../../repository/ProductRepositoryInterface';
 import { SimulateFreight } from './SimulateFreight';
 import { FreightCalculatorInput } from '../../entities/dto/FreightCalculatorInput';
 import { STORE_REPOSITORY, StoreRepositoryInterface } from '../../repository/StoreRepositoryInterface';
@@ -20,7 +17,6 @@ import { STORE_DATABASE } from '../../../adapters/storage/data/StoreDatabaseInte
 
 describe('UseCase:SimulateFreight', () => {
   let simulateFreight: SimulateFreight;
-  let productRepository: ProductRepositoryInterface;
   let storeRepository: StoreRepositoryInterface;
   let geocodingGateway: GeocodingGateway;
 
@@ -37,7 +33,6 @@ describe('UseCase:SimulateFreight', () => {
       ],
     }).compile();
     simulateFreight = await usecaseRefTestModule.resolve(SimulateFreight);
-    productRepository = await usecaseRefTestModule.resolve(PRODUCT_REPOSITORY);
     storeRepository = await usecaseRefTestModule.resolve(STORE_REPOSITORY);
     geocodingGateway = await usecaseRefTestModule.resolve(GEO_CODING_GATEWAY);
   });

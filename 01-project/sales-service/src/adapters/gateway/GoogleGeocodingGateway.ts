@@ -13,22 +13,27 @@ export class GoogleGeocodingGateway implements GeocodingGateway {
 
   async getLatLgnByPostalCode(postalCode: string): Promise<Coordinates> {
     const config = this.configService.get<GoogleAPIConfig>('google');
-    const { data } = await firstValueFrom(
-      this.httpService
-        .get(config.geocoding_api, {
-          params: {
-            key: config.api_key,
-            address: postalCode,
-          },
-        })
-        .pipe(
-          catchError((error: AxiosError) => {
-            console.log(error);
-            throw error;
-          }),
-        ),
-    );
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService
+          .get(config.geocoding_api, {
+            params: {
+              key: config.api_key,
+              address: postalCode,
+            },
+          })
+          .pipe(
+            catchError((error: AxiosError) => {
+              console.log(error);
+              throw error;
+            }),
+          ),
+      );
 
-    return new Coordinates(data.results[0].geometry.location.lat, data.results[0].geometry.location.lng);
+      return new Coordinates(data.results[0].geometry.location.lat, data.results[0].geometry.location.lng);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 }

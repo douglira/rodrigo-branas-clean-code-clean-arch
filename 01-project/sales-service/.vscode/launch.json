@@ -46,7 +46,8 @@
         "run",
         "test:e2e",
         "--",
-        "--inspect-brk"
+        "--inspect-brk",
+        "--testTimeout=9999999"
       ],
       "autoAttachChildProcesses": true,
       "restart": true,

@@ -18,9 +18,7 @@ export class SimulateFreight implements SimulateFreightInterface {
   private calculateOrderItem(freight: Freight, item: FreightItemInput): void {
     const cost =
       item.quantity *
-      freight.calculateMeasurementsCost(
-        new Measurements(item.product.width, item.product.height, item.product.depth, item.product.weight),
-      );
+      freight.calculateMeasurementsCost(new Measurements(item.width, item.height, item.depth, item.weight));
     freight.addCost(cost);
   }
 

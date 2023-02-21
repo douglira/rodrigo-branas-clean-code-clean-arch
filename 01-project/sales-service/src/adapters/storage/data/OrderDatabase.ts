@@ -11,8 +11,7 @@ export class OrderDatabase implements OrderDatabaseInterface {
   async register(order: any): Promise<any> {
     try {
       const result = await this.db.tx(async (t) => {
-        const queryInsertOrder =
-          'INSERT INTO sales_service.orders (serial_code, created_at, cpf, total_amount, freight_price, coupon_id) VALUES ((select * from sales_service.get_order_serial_number_seq()), now(), $(cpf), $(total_amount), $(freight_price), coalesce($(coupon_id)::uuid, NULL)) RETURNING id, serial_code';
+        const queryInsertOrder = `INSERT INTO sales_service.orders (serial_code, created_at, cpf, total_amount, freight_price, coupon_id) VALUES ((select * from sales_service.get_order_serial_number_seq()), now(), $(cpf), $(total_amount), $(freight_price), coalesce($(coupon_id)::uuid, NULL)) RETURNING id, serial_code, TIMEZONE('UTC', created_at) AS created_at`;
         const orderInsertResult = await t.one(queryInsertOrder, {
           cpf: order.cpf,
           total_amount: order.totalAmount,
@@ -42,7 +41,7 @@ export class OrderDatabase implements OrderDatabaseInterface {
         SELECT
           otb.id,
           otb.serial_code,
-          timezone('UTC', otb.created_at) AS created_at,
+          TIMEZONE('UTC', otb.created_at) AS created_at,
           otb.cpf,
           otb.total_amount,
           otb.freight_price,
@@ -77,7 +76,7 @@ export class OrderDatabase implements OrderDatabaseInterface {
         SELECT
           otb.id,
           otb.serial_code,
-          timezone('UTC', otb.created_at) AS created_at,
+          TIMEZONE('UTC', otb.created_at) AS created_at,
           otb.cpf,
           otb.total_amount,
           otb.freight_price,

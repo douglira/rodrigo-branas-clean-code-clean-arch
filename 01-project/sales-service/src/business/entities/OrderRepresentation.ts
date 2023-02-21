@@ -11,8 +11,4 @@ export default class OrderRepresentation {
     readonly couponCode?: string,
     readonly items?: OrderItem[],
   ) {}
-
-  getSerialCode(): string {
-    return this.serialCode;
-  }
 }

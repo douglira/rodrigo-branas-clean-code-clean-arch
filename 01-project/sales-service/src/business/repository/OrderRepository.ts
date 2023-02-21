@@ -23,7 +23,7 @@ export class OrderRepository implements OrderRepositoryInterface {
       })),
     };
     const result = await this.orderDatabase.register(order);
-    return new OrderRepresentation(result.id, result.serial_code);
+    return new OrderRepresentation(result.id, result.serial_code, result.created_at);
   }
 
   async getBySerialCode(serialCode: string): Promise<OrderRepresentation> {

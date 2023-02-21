@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS sales_service.orders (
   created_at TIMESTAMP NOT NULL,
   cpf TEXT NOT NULL,
   total_amount NUMERIC(12,2) NOT NULL,
-  freight_price NUMERIC(5,2) NOT NULL,
+  freight_price NUMERIC(10,2) NOT NULL,
   coupon_id uuid,
   CONSTRAINT orders_pkey PRIMARY KEY (id),
   CONSTRAINT orders_coupons_fkey FOREIGN KEY(coupon_id) REFERENCES sales_service.coupons(id)

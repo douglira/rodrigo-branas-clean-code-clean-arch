@@ -54,18 +54,13 @@ export class GenerateOrderSolicitation implements GenerateOrderSolicitationInter
       orderSolicitation.addItem(product, mapProductIdQuantity.get(product.id));
       freightItems.push({
         quantity: mapProductIdQuantity.get(product.id),
-        product: {
-          id: product.id,
-          width: product.getMeasurements().width,
-          height: product.getMeasurements().height,
-          depth: product.getMeasurements().depth,
-          weight: product.getMeasurements().weight,
-        },
+        width: product.getMeasurements().width,
+        height: product.getMeasurements().height,
+        depth: product.getMeasurements().depth,
+        weight: product.getMeasurements().weight,
       });
     }
-    const simulateFreightInput = new FreightCalculatorInput();
-    simulateFreightInput.addresseePostalCode = orderSolicitationInput.addresseePostalCode;
-    simulateFreightInput.items = freightItems;
+    const simulateFreightInput = new FreightCalculatorInput(orderSolicitationInput.addresseePostalCode, freightItems);
     const outputFreightSimulate = await this.simulateFreight.execute(simulateFreightInput);
     orderSolicitation.setFreight(outputFreightSimulate.freightCost);
     return orderSolicitation;

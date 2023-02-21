@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CheckoutOrderSolicitation } from './CheckoutOrderSolicitation';
-import OrderRepresentation from '../../entities/OrderRepresentation';
 import { ORDER_DATABASE, OrderDatabaseInterface } from '../../../adapters/storage/data/OrderDatabaseInterface';
 import { OrderRepository } from '../../repository/OrderRepository';
 import { OrderRepositoryInterface, ORDER_REPOSITORY } from '../../repository/OrderRepositoryInterface';
@@ -45,13 +44,15 @@ describe('UseCase:CheckoutOrderSolicitation', () => {
       .spyOn(generateOrderSolicitation, 'execute')
       .mockResolvedValue(new OrderSolicitation('cpf'));
     const orderRepositoryMock = jest.spyOn(orderRepository, 'create');
+    const creationDateMock = new Date();
     const orderDatabaseMock = jest
       .spyOn(orderDatabase, 'register')
-      .mockResolvedValue({ id: 'ID1', serial_code: '202300000001' });
+      .mockResolvedValue({ id: 'ID1', serial_code: '202300000001', created_at: creationDateMock });
     const result = await checkoutOrderSolicitation.execute(orderSolicitationInput);
     expect(orderSolicitationServiceGenerateSpy).toBeCalledTimes(1);
     expect(orderRepositoryMock).toBeCalledTimes(1);
     expect(orderDatabaseMock).toBeCalledTimes(1);
     expect(result.serialCode).toBe('202300000001');
+    expect(result.creationDate).toEqual(creationDateMock);
   });
 });
