@@ -15,7 +15,7 @@ export class GoogleGeocodingGateway implements GeocodingGateway {
     const config = this.configService.get<GoogleAPIConfig>('google');
     const { data } = await firstValueFrom(
       this.httpService
-        .get('https://maps.googleapis.com/maps/api/geocode/json', {
+        .get(config.geocoding_api, {
           params: {
             key: config.api_key,
             address: postalCode,

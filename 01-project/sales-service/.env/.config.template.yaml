@@ -15,4 +15,5 @@ db:
       connection_timeout_millis: 2000
 
 google:
+  geocoding_api: https://maps.googleapis.com/maps/api/geocode/json
   api_key:

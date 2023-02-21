@@ -25,10 +25,10 @@ import {
 export class FreightControllerV1 {
   constructor(@Inject(SIMULATE_FREIGHT) private readonly simulateFreight: SimulateFreightInterface) {}
 
-  @Post('calculate')
+  @Post('simulate')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true }))
-  async calculate(@Body() body: FreightCalculatorInput): Promise<FreightCalculatorOutput> {
+  async simulate(@Body() body: FreightCalculatorInput): Promise<FreightCalculatorOutput> {
     return this.simulateFreight.execute(body);
   }
 }

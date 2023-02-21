@@ -28,7 +28,8 @@
         "test:debug",
         "--",
         "--watch",
-        "--verbose"
+        "--verbose",
+        "--testTimeout=9999999"
       ],
       "autoAttachChildProcesses": true,
       "restart": true,

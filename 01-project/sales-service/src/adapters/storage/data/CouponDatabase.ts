@@ -10,7 +10,7 @@ export class CouponDatabase implements CouponDatabaseInterface {
 
   async findByName(name: string): Promise<any> {
     try {
-      const queryString = `SELECT * FROM sales_service.coupons c WHERE c."name" = $(code) LIMIT 1`;
+      const queryString = `SELECT c.id, c."name", c.discount, timezone('UTC', c.expires_in) as expires_in FROM sales_service.coupons c WHERE c."name" = $(code) LIMIT 1`;
       const result = await this.db.any(queryString, { code: name });
       return result;
     } catch (err) {

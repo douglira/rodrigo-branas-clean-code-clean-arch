@@ -1,9 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
+import * as nock from 'nock';
+import { GoogleAPIConfig } from '../src/config/Configuration';
+import { join } from 'path';
+import { readFileSync } from 'fs';
+import * as yaml from 'js-yaml';
+import { ConfigService } from '@nestjs/config';
 
 const timestampRegexMatching = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d{1,3}/;
+
+jest.mock('../src/config/Configuration.ts', () => ({
+  default: async () => {
+    const path = join(__dirname, '..', '.env', '.config.test.yaml');
+    return yaml.load(readFileSync(path, 'utf8')) as Record<string, any>;
+  },
+}));
 
 describe('OrderSolicitationControllerV1 (e2e)', () => {
   let app: INestApplication;
@@ -14,13 +27,25 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    const configService = app.get(ConfigService);
+    const googleConfig = configService.get<GoogleAPIConfig>('google');
+    nock(/.*maps\.googleapis\.com.*/)
+      .get(/.*/)
+      .reply(200, {
+        results: [
+          {
+            geometry: { location: { lat: -23.534082, lng: -46.204355 } },
+          },
+        ],
+      });
     await app.init();
   });
 
   describe('/v1/orders/preview (POST)', () => {
     it('should success with 2 order items and 1 coupon', () => {
       const input = {
-        cpf: '423.655.858-09',
+        cpf: '42365585809',
+        addresseePostalCode: '37653000',
         coupon: 'VALE20',
         orderItems: [
           {
@@ -38,12 +63,13 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
         .set('Accept', 'application/json')
         .send(input)
         .expect(HttpStatus.OK)
-        .expect({ totalAmount: 178.84, freightCost: 47 });
+        .expect({ totalAmount: 2657.07, freightCost: 2525.23 });
     });
     it('should error with expired coupon', async () => {
       const input = {
-        cpf: '423.655.858-09',
-        coupon: 'VALE25',
+        cpf: '42365585809',
+        addresseePostalCode: '37653000',
+        coupon: 'BEMVINDO10',
         orderItems: [
           {
             productId: '2558a6df-c01f-41db-b378-75c7402508d5',
@@ -69,7 +95,8 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
   });
   it('should error with repeated order item product', async () => {
     const input = {
-      cpf: '423.655.858-09',
+      cpf: '42365585809',
+      addresseePostalCode: '37653000',
       coupon: 'VALE20',
       orderItems: [
         {
@@ -93,7 +120,7 @@ describe('OrderSolicitationControllerV1 (e2e)', () => {
     expect(result.statusCode).toEqual(HttpStatus.BAD_REQUEST);
     expect(result.body).toMatchObject({
       error: 'Bad Request',
-      message: ['Invalid products'],
+      message: ['Duplicated products'],
       statusCode: 400,
     });
   });

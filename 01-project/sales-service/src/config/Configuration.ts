@@ -21,6 +21,7 @@ export interface DatabaseConfig {
 
 export interface GoogleAPIConfig {
   api_key: string;
+  geocoding_api: string;
 }
 
 export default () => {
